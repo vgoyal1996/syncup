@@ -10,6 +10,7 @@ import lombok.ToString;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
@@ -24,15 +25,27 @@ import javax.validation.constraints.NotEmpty;
 public class Client {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
     @Column(name = "name")
     @NotEmpty
     private String name;
-    @Column(name = "address")
+    @Column(name = "flat_no")
     @NotEmpty
-    private String address;
+    private String flatNo;
+    @Column(name = "area")
+    @NotEmpty
+    private String area;
+    @Column(name = "city")
+    @NotEmpty
+    private String city;
+    @Column(name = "state")
+    @NotEmpty
+    private String state;
+    @Column(name = "PIN")
+    @NotEmpty
+    private String pin;
     @Column(name = "client_type")
     @NotEmpty
     private String clientType;
@@ -42,22 +55,18 @@ public class Client {
     @Column(name = "client_email_id")
     @NotEmpty
     private String clientEmail;
+    @Column(name = "PAN")
+    @NotEmpty
+    private String pan;
     @Column(name = "DOB_or_DOI")
     @NotEmpty
     private String doiOrDob;
     @Column(name = "responsible_person_name")
     private String responsiblePersonName;
-    @Column(name = "PAN")
+    @Column(name = "responsible_person_PAN")
     private String responsiblePersonPAN;
     @Column(name = "responsible_person_DOB")
     private String responsiblePersonDOB;
-    @Column(name = "aadhaar")
-    @NotEmpty
+    @Column(name = "responsible_person_aadhaar")
     private String responsiblePersonAadhaar;
-    @Column(name = "GST_no")
-    private String gstNo;
-    @Column(name = "CIN_no")
-    private String cinNo;
-    @Column(name = "TAN_no")
-    private String tanNo;
 }
