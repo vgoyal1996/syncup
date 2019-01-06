@@ -36,17 +36,28 @@ public class Client {
     @Column(name = "client_type")
     @NotEmpty
     private String clientType;
+    @Column(name = "mobile")
+    @NotEmpty
+    private String mobile;
+    @Column(name = "client_email_id")
+    @NotEmpty
+    private String clientEmail;
     @Column(name = "DOB_or_DOI")
     @NotEmpty
     private String doiOrDob;
     @Column(name = "responsible_person_name")
     private String responsiblePersonName;
     @Column(name = "PAN")
-    @NotEmpty
     private String responsiblePersonPAN;
     @Column(name = "responsible_person_DOB")
     private String responsiblePersonDOB;
     @Column(name = "aadhaar")
     @NotEmpty
     private String responsiblePersonAadhaar;
+    @Column(name = "GST_no")
+    private String gstNo;
+    @Column(name = "CIN_no")
+    private String cinNo;
+    @Column(name = "TAN_no")
+    private String tanNo;
 }

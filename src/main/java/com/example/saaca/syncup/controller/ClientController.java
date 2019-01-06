@@ -18,8 +18,9 @@ public class ClientController {
     private ClientRepository clientRepository;
 
     @PostMapping("/add")
-    public void createClient(@RequestBody final Client client){
-        clientRepository.save(client);
+    public int createClient(@RequestBody final Client client){
+        Client resultantModel = clientRepository.save(client);
+        return resultantModel.getId();
     }
 
 }
