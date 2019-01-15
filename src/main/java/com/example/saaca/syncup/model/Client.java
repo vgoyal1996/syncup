@@ -69,4 +69,6 @@ public class Client {
     private String responsiblePersonDOB;
     @Column(name = "responsible_person_aadhaar")
     private String responsiblePersonAadhaar;
+    @Column(name = "CIN")
+    private String cin;
 }
