@@ -44,3 +44,12 @@ CREATE TABLE login(
 	password VARCHAR(50) not null,
 	PRIMARY KEY(login_id)
 )ENGINE=InnoDB;
+
+CREATE TABLE return_forms(
+	form_id int not null AUTO_INCREMENT,
+	form_name VARCHAR(50) not null,
+	return_type VARCHAR(10) not null,
+	due_date_of_filing VARCHAR(20) not null,
+	periodicity VARCHAR(20) not null,
+	PRIMARY KEY(form_id)
+)ENGINE=InnoDB;
