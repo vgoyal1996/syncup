@@ -18,9 +18,7 @@ public class ReturnCredentialsController {
     private ReturnCredentialsRepository returnCredentialsRepository;
 
     @PostMapping("/add")
-    public void createReturnCredentials(@RequestBody final ReturnCredentials[] returnCredentials){
-        for(ReturnCredentials singleReturnCredentials : returnCredentials) {
-            returnCredentialsRepository.save(singleReturnCredentials);
-        }
+    public void createReturnCredentials(@RequestBody final ReturnCredentials returnCredentials){
+        returnCredentialsRepository.save(returnCredentials);
     }
 }
