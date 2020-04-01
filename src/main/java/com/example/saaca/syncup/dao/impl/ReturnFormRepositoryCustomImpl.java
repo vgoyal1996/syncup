@@ -21,4 +21,16 @@ public class ReturnFormRepositoryCustomImpl implements ReturnFormRepositoryCusto
         query.setParameter(1, returnType);
         return query.getResultList();
     }
+
+    @Override
+    public ReturnForm findByReturnTypeAndReturnForm(String returnType, String returnFormName) {
+        Query query = entityManager.createNativeQuery("select * from return_forms where form_name = ? and return_type = ?", ReturnForm.class);
+        query.setParameter(1, returnFormName);
+        query.setParameter(2, returnType);
+        List<ReturnForm> resultList = query.getResultList();
+        if (resultList == null || resultList.size() == 0) {
+            return null;
+        }
+        return resultList.get(0);
+    }
 }

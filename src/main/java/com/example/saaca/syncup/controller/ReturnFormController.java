@@ -21,8 +21,25 @@ public class ReturnFormController {
     }
 
     @GetMapping("/get/{returnType}")
-    public List<ReturnForm> getReturnForms(@PathVariable(value = "returnType") String returnType){
+    public List<ReturnForm> getReturnForms(@PathVariable(value = "returnType")final String returnType){
         return returnFormRepository.findByReturnType(returnType);
+    }
+
+    @PutMapping("/{returnType}/{returnName}")
+    public boolean updateReturnForm(@PathVariable(value = "returnType")final String returnType,
+                                    @PathVariable(value = "returnName")final String returnName,
+                                    @RequestBody final ReturnForm newReturnForm){
+        ReturnForm oldReturnForm = returnFormRepository.findByReturnTypeAndReturnForm(returnType, returnName);
+        if (oldReturnForm == null) {
+            return false;
+        }
+        oldReturnForm.setFormName(newReturnForm.getFormName());
+        oldReturnForm.setReturnType(newReturnForm.getReturnType());
+        oldReturnForm.setPeriodicity(newReturnForm.getPeriodicity());
+        oldReturnForm.setDueDateOfFiling(newReturnForm.getDueDateOfFiling());
+
+        ReturnForm result = returnFormRepository.save(oldReturnForm);
+        return true;
     }
 
 }
