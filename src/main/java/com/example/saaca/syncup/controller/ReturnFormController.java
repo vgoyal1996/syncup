@@ -5,6 +5,8 @@ import com.example.saaca.syncup.model.ReturnForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -40,6 +42,13 @@ public class ReturnFormController {
 
         ReturnForm result = returnFormRepository.save(oldReturnForm);
         return true;
+    }
+
+    @DeleteMapping("/{returnType}")
+    @Transactional
+    public int deleteReturnForms(@PathVariable(value = "returnType")final String returnType,
+                                  @RequestBody final String[] formNameList) {
+        return returnFormRepository.deleteReturnFormsWithFormNames(Arrays.asList(formNameList));
     }
 
 }
