@@ -49,7 +49,9 @@ CREATE TABLE return_forms(
 	form_id int not null AUTO_INCREMENT,
 	form_name VARCHAR(50) not null,
 	return_type VARCHAR(10) not null,
-	due_date_of_filing VARCHAR(20) not null,
+	due_date_of_filing DATETIME not null,
 	periodicity VARCHAR(20) not null,
+	UNIQUE INDEX(form_name),
+	INDEX(return_type),
 	PRIMARY KEY(form_id)
 )ENGINE=InnoDB;
