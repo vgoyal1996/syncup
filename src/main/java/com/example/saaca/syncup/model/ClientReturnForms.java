@@ -18,11 +18,11 @@ public class ClientReturnForms {
     @NotFound(action = NotFoundAction.IGNORE)
     private ClientReturnFormsId id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", referencedColumnName = "id", updatable = false, insertable = false)
     private Client client;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "form_name", referencedColumnName = "form_name", updatable = false, insertable = false)
     private ReturnForm returnForm;
 

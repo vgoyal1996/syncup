@@ -73,7 +73,7 @@ public class Client implements Serializable {
     private String cin;
     @OneToMany(
             mappedBy = "client",
-            cascade = CascadeType.MERGE,
+            cascade = {CascadeType.MERGE, CascadeType.REMOVE},
             orphanRemoval = true
     )
     @JsonIgnore

@@ -23,10 +23,6 @@ import java.util.Objects;
 @Setter
 @RequiredArgsConstructor
 @ToString
-@NaturalIdCache
-@Cache(
-        usage = CacheConcurrencyStrategy.READ_WRITE
-)
 public class ReturnForm implements Serializable {
 
     @Id
@@ -35,7 +31,6 @@ public class ReturnForm implements Serializable {
     private int formId;
     @Column(name = "form_name")
     @NotNull
-    @NaturalId
     private String formName;
     @Column(name = "return_type")
     @NotNull
@@ -48,7 +43,7 @@ public class ReturnForm implements Serializable {
     private String periodicity;
     @OneToMany(
             mappedBy = "returnForm",
-            cascade = CascadeType.MERGE,
+            cascade = {CascadeType.MERGE, CascadeType.REMOVE},
             orphanRemoval = true
     )
     @JsonIgnore
