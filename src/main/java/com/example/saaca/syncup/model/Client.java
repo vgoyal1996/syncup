@@ -1,19 +1,20 @@
 package com.example.saaca.syncup.model;
 
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "client_credentials")
@@ -21,8 +22,7 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @RequiredArgsConstructor
 @ToString
-@EqualsAndHashCode
-public class Client {
+public class Client implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,4 +71,44 @@ public class Client {
     private String responsiblePersonAadhaar;
     @Column(name = "CIN")
     private String cin;
+    @OneToMany(
+            mappedBy = "client",
+            cascade = CascadeType.MERGE,
+            orphanRemoval = true
+    )
+    @JsonIgnore
+    private List<ClientReturnForms> assignedReturnForms = new ArrayList<>();
+
+    public void addReturnForm(ReturnForm returnForm){
+        ClientReturnForms clientReturnForms = new ClientReturnForms(this, returnForm);
+        assignedReturnForms.add(clientReturnForms);
+        returnForm.getApplicableReturnForms().add(clientReturnForms);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Client client = (Client) o;
+        return id == client.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    public void removeReturnForm(ReturnForm returnForm){
+        for(Iterator<ClientReturnForms> iterator = assignedReturnForms.iterator();
+            iterator.hasNext();) {
+           ClientReturnForms clientReturnForms = iterator.next();
+           if(clientReturnForms.getClient().equals(this) &&
+                clientReturnForms.getReturnForm().equals(returnForm)) {
+               iterator.remove();
+               clientReturnForms.getReturnForm().getApplicableReturnForms().remove(clientReturnForms);
+               clientReturnForms.setClient(null);
+               clientReturnForms.setReturnForm(null);
+           }
+        }
+    }
 }

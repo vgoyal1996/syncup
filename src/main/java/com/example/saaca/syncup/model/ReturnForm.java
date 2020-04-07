@@ -1,18 +1,21 @@
 package com.example.saaca.syncup.model;
 
-import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
+import org.hibernate.annotations.Cache;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "return_forms")
@@ -20,8 +23,11 @@ import javax.validation.constraints.NotNull;
 @Setter
 @RequiredArgsConstructor
 @ToString
-@EqualsAndHashCode
-public class ReturnForm {
+@NaturalIdCache
+@Cache(
+        usage = CacheConcurrencyStrategy.READ_WRITE
+)
+public class ReturnForm implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +35,7 @@ public class ReturnForm {
     private int formId;
     @Column(name = "form_name")
     @NotNull
+    @NaturalId
     private String formName;
     @Column(name = "return_type")
     @NotNull
@@ -39,5 +46,24 @@ public class ReturnForm {
     @Column(name = "periodicity")
     @NotNull
     private String periodicity;
+    @OneToMany(
+            mappedBy = "returnForm",
+            cascade = CascadeType.MERGE,
+            orphanRemoval = true
+    )
+    @JsonIgnore
+    private List<ClientReturnForms> applicableReturnForms = new ArrayList<>();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReturnForm that = (ReturnForm) o;
+        return Objects.equals(formName, that.formName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(formName);
+    }
 }
