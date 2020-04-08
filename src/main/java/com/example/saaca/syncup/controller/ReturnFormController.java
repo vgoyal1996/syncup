@@ -51,4 +51,9 @@ public class ReturnFormController {
         return returnFormRepository.deleteReturnFormsWithFormNames(Arrays.asList(formNameList));
     }
 
+    @GetMapping("/all")
+    public List<ReturnForm> getReturnForms() {
+        return returnFormRepository.findAll();
+    }
+
 }

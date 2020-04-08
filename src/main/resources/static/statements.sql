@@ -58,3 +58,15 @@ CREATE TABLE return_forms(
 	INDEX(return_type),
 	PRIMARY KEY(form_id)
 )ENGINE=InnoDB;
+
+CREATE TABLE client_return_form_applicability(
+	client_id int NOT NULL,
+    form_name VARCHAR(50) NOT NULL,
+    INDEX(client_id),
+    INDEX(form_name),
+    FOREIGN KEY(client_id) REFERENCES client_credentials(id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(form_name) REFERENCES return_forms(form_name)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY(client_id, form_name)
+)ENGINE=InnoDB;
