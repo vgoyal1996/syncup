@@ -54,6 +54,7 @@ CREATE TABLE return_forms(
 	return_type VARCHAR(10) not null,
 	due_date_of_filing DATETIME not null,
 	periodicity VARCHAR(20) not null,
+	revised_due_date_of_filing DATETIME not null,
 	UNIQUE INDEX(form_name),
 	INDEX(return_type),
 	PRIMARY KEY(form_id)
