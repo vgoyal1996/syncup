@@ -7,14 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 @Table(name = "return_credentials")
@@ -59,5 +55,6 @@ public class ReturnCredentials {
     private String tracesUserId;
     @Column(name = "traces_password")
     private String tracesPassword;
-
+    @Transient
+    private List<String> applicableReturnForms;
 }
