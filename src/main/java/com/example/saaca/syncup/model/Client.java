@@ -31,6 +31,12 @@ public class Client {
     @Column(name = "name")
     @NotEmpty
     private String name;
+    @Column(name = "client_code", unique = true)
+    @NotEmpty
+    private String clientCode;
+    @Column(name = "father_name")
+    @NotEmpty
+    private String fatherName;
     @Column(name = "flat_no")
     @NotEmpty
     private String flatNo;

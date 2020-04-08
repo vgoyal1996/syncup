@@ -1,6 +1,8 @@
 CREATE table client_credentials(
 	id int not null AUTO_INCREMENT,
 	name VARCHAR(50) not null,
+	client_code VARCHAR(50) not null,
+	father_name VARCHAR(100) not null,
 	flat_no VARCHAR(50) not null,
 	area VARCHAR(50) not null,
 	city VARCHAR(50) not null,
@@ -16,6 +18,7 @@ CREATE table client_credentials(
 	responsible_person_DOB VARCHAR(50),
 	responsible_person_aadhaar VARCHAR(20),
 	CIN VARCHAR(30),
+	UNIQUE INDEX(client_code),
 	PRIMARY KEY(id)
 )ENGINE=InnoDB;
 
