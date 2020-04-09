@@ -41,6 +41,9 @@ public class ReturnForm implements Serializable {
     @Column(name = "periodicity")
     @NotNull
     private String periodicity;
+    @Column(name = "revised_due_date_of_filing")
+    @NotNull
+    private String revisedDueDateOfFiling;
     @OneToMany(
             mappedBy = "returnForm",
             cascade = {CascadeType.MERGE, CascadeType.REMOVE},

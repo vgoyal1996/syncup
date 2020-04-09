@@ -39,6 +39,7 @@ public class ReturnFormController {
         oldReturnForm.setReturnType(newReturnForm.getReturnType());
         oldReturnForm.setPeriodicity(newReturnForm.getPeriodicity());
         oldReturnForm.setDueDateOfFiling(newReturnForm.getDueDateOfFiling());
+        oldReturnForm.setRevisedDueDateOfFiling(newReturnForm.getRevisedDueDateOfFiling());
 
         ReturnForm result = returnFormRepository.save(oldReturnForm);
         return true;
