@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -30,6 +31,11 @@ public class ReturnCredentialsController {
     public void createReturnCredentials(@RequestBody final ReturnCredentials returnCredentials){
         List<String> applicableFormNames = returnCredentials.getApplicableReturnForms();
         returnCredentials.setApplicableReturnForms(null);
+        if (returnCredentials.getReturnType().equals("roc") &&
+                Objects.isNull(returnCredentials.getUserId()) && Objects.isNull(returnCredentials.getPassword())) {
+            returnCredentials.setUserId("");
+            returnCredentials.setPassword("");
+        }
         returnCredentialsRepository.save(returnCredentials);
         Optional<Client> op = clientRepository.findById(returnCredentials.getId());
         Client client = op.get();
