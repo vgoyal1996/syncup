@@ -39,6 +39,7 @@ CREATE TABLE return_credentials(
 	traces_password VARCHAR(50),
 	PRIMARY KEY(return_id),
 	FOREIGN KEY(id) REFERENCES client_credentials(id)
+	ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
 
 CREATE TABLE login(
