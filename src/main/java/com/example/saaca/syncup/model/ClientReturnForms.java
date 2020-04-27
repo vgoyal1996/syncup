@@ -20,7 +20,8 @@ public class ClientReturnForms {
     private ClientReturnFormsId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="return_credentials_id", referencedColumnName = "return_id", updatable = false, insertable = false)
+    @JoinColumn(name="return_credentials_id")
+    @JsonBackReference
     private ReturnCredentials returnCredentials;
 
     @ManyToOne(fetch = FetchType.LAZY)

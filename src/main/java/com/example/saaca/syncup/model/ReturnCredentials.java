@@ -2,7 +2,6 @@ package com.example.saaca.syncup.model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -14,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -22,16 +22,12 @@ import java.util.Set;
 @Setter
 @RequiredArgsConstructor
 @ToString
-@EqualsAndHashCode
 public class ReturnCredentials implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "return_id")
     private int returnId;
-    @Column(name = "id")
-    @NotNull
-    private int id;
     @Column(name = "assessment_year")
     @NotNull
     private String assessmentYear;
@@ -62,18 +58,39 @@ public class ReturnCredentials implements Serializable {
     private String tracesUserId;
     @Column(name = "traces_password")
     private String tracesPassword;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
+    @JsonBackReference
+    private Client client;
     @OneToMany(
             mappedBy = "returnCredentials",
-            cascade = {CascadeType.ALL},
-            fetch = FetchType.LAZY
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
-    @JsonBackReference
-    private Set<ClientReturnForms> formsList = new HashSet<>();
+    private Set<ClientReturnForms> returnFormsList = new HashSet<>();
     @Transient
     private List<String> applicableReturnForms;
 
-    public void addToFormList(ClientReturnForms forms) {
-        forms.setReturnCredentials(this);
-        formsList.add(forms);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReturnCredentials that = (ReturnCredentials) o;
+        return returnId == that.returnId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(returnId);
+    }
+
+    public void addClientReturnForm(ClientReturnForms clientReturnForm) {
+        returnFormsList.add(clientReturnForm);
+        clientReturnForm.setReturnCredentials(this);
+    }
+
+    public void removeClientReturnForm(ClientReturnForms clientReturnForms) {
+        returnFormsList.remove(clientReturnForms);
+        clientReturnForms.setReturnCredentials(null);
     }
 }

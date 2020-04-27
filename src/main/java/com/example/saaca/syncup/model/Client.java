@@ -2,7 +2,6 @@ package com.example.saaca.syncup.model;
 
 
 import com.fasterxml.jackson.annotation.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -74,12 +73,28 @@ public class Client implements Serializable {
     private String responsiblePersonAadhaar;
     @Column(name = "CIN")
     private String cin;
+    @OneToMany(mappedBy = "client",
+                cascade = CascadeType.ALL,
+                orphanRemoval = true)
+    @JsonBackReference
+    private Set<ReturnCredentials> returnCredentialsList = new HashSet<>();
     @OneToMany(
             mappedBy = "client",
             cascade = {CascadeType.MERGE, CascadeType.REMOVE},
             orphanRemoval = true
     )
+    @JsonBackReference
     private Set<ClientReturnForms> assignedReturnForms = new HashSet<>();
+
+    public void addReturnCredential(ReturnCredentials returnCredential) {
+        returnCredentialsList.add(returnCredential);
+        returnCredential.setClient(this);
+    }
+
+    public void removeReturnCredential(ReturnCredentials returnCredential) {
+        returnCredentialsList.remove(returnCredential);
+        returnCredential.setClient(null);
+    }
 
     public void addClientReturnForm(ClientReturnForms clientReturnForms, ReturnForm returnForm) {
         assignedReturnForms.add(clientReturnForms);

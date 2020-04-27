@@ -10,6 +10,7 @@ import com.example.saaca.syncup.model.ReturnForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @RestController
@@ -26,8 +27,10 @@ public class ReturnCredentialsController {
     @Autowired
     private ClientRepository clientRepository;
 
-    @PostMapping("/add")
-    public void createReturnCredentials(@RequestBody final ReturnCredentials returnCredentials){
+    @PostMapping("/{client_id}")
+    @Transactional
+    public void createReturnCredentials(@PathVariable(value = "client_id")final int clientId,
+            @RequestBody final ReturnCredentials returnCredentials){
         List<String> applicableFormNames = returnCredentials.getApplicableReturnForms();
         returnCredentials.setApplicableReturnForms(null);
         if (returnCredentials.getReturnType().equals("roc") &&
@@ -35,43 +38,19 @@ public class ReturnCredentialsController {
             returnCredentials.setUserId("");
             returnCredentials.setPassword("");
         }
-        Optional<Client> op = clientRepository.findById(returnCredentials.getId());
-        Client client = op.get();
+        Client client = clientRepository.findById(clientId).get();
         List<ReturnForm> applicableForms = returnFormRepository.findByFormNames(applicableFormNames);
-        //Set<ClientReturnForms> clientReturnFormsSet = new HashSet<>();
         for (ReturnForm applicableForm: applicableForms) {
-            ClientReturnForms clientReturnForms = new ClientReturnForms(client, applicableForm, returnCredentials.getAssessmentYear());
-            client.addClientReturnForm(clientReturnForms, applicableForm);
-            returnCredentials.addToFormList(clientReturnForms);
-            //clientReturnFormsSet.add(clientReturnForms);
+            ClientReturnForms clientReturnForm = new ClientReturnForms(client, applicableForm, returnCredentials.getAssessmentYear());
+            returnCredentials.addClientReturnForm(clientReturnForm);
         }
-        //returnCredentials.setFormsList(clientReturnFormsSet);
-        returnCredentialsRepository.save(returnCredentials);
-        //clientReturnFormsRepository.saveAll(clientReturnFormsSet);
-        clientRepository.save(client);
-
-
-
-//        for (ReturnForm applicableForm : applicableForms) {
-//            client.addReturnForm(applicableForm, returnCredentials.getAssessmentYear());
-//        }
-//        Set<ClientReturnForms> clientReturnFormsSet = new HashSet<>();
-//        for (ReturnForm applicableForm: applicableForms) {
-//            ClientReturnForms form = new ClientReturnForms(client, applicableForm, returnCredentials.getAssessmentYear());
-//            form.setReturnCredentials(returnCredentials);
-//            clientReturnFormsSet.add(form);
-//            client.addReturnForm(form, applicableForm);
-//        }
-//        returnCredentials.setApplicableForms(clientReturnFormsSet);
-//        returnCredentialsRepository.save(returnCredentials);
-//        clientReturnFormsRepository.saveAll(clientReturnFormsSet);
-        //clientRepository.save(client);
+        client.addReturnCredential(returnCredentials);
     }
 
     @GetMapping("/{assessment_year}/{id}")
-    public ReturnCredentials[] getReturnCredentialsByClientId(
+    public List<ReturnCredentials> getReturnCredentialsByClientId(
             @PathVariable(value = "assessment_year")final String assessmentYear,
             @PathVariable(value = "id")final int id) {
-        return returnCredentialsRepository.findById(assessmentYear, id);
+        return returnCredentialsRepository.findByAssessmentYearAndId(assessmentYear, id);
     }
 }

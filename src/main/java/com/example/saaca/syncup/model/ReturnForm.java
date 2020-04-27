@@ -5,10 +5,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.NaturalIdCache;
-import org.hibernate.annotations.Cache;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -44,7 +40,7 @@ public class ReturnForm implements Serializable {
     private String revisedDueDateOfFiling;
     @OneToMany(
             mappedBy = "returnForm",
-            cascade = {CascadeType.MERGE, CascadeType.REMOVE},
+            cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     @JsonBackReference

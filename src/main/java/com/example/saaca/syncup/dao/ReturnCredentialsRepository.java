@@ -5,9 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ReturnCredentialsRepository extends JpaRepository<ReturnCredentials, Integer> {
 
-    @Query("select r from ReturnCredentials r where r.assessmentYear = :assessmentYear and r.id = :id")
-    ReturnCredentials[] findById(final String assessmentYear, final int id);
+    @Query("select r from ReturnCredentials r where r.assessmentYear = :assessmentYear and r.client.id = :id")
+    List<ReturnCredentials> findByAssessmentYearAndId(final String assessmentYear, final int id);
 }

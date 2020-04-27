@@ -21,6 +21,7 @@ public class ClientController {
     private ClientRepository clientRepository;
 
     @PostMapping("/add")
+    @Transactional
     public int createClient(@RequestBody final Client client){
         Client resultantModel = clientRepository.save(client);
         return resultantModel.getId();
