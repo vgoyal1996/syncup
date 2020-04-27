@@ -1,5 +1,6 @@
 package com.example.saaca.syncup.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NotFound;
@@ -19,19 +20,33 @@ public class ClientReturnForms {
     private ClientReturnFormsId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="return_credentials_id", referencedColumnName = "return_id", updatable = false, insertable = false)
+    private ReturnCredentials returnCredentials;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", referencedColumnName = "id", updatable = false, insertable = false)
+    @JsonBackReference
     private Client client;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "form_name", referencedColumnName = "form_name", updatable = false, insertable = false)
     private ReturnForm returnForm;
 
+    @Column(name = "acknowledgement_no")
+    private String acknowledgementNo;
+
+    @Column(name = "date_of_filing")
+    private String dateOfFiling;
+
+    @Column(name = "date_of_physical_deposit")
+    private String dateOfPhysicalDeposit;
+
     private ClientReturnForms() {}
 
-    public ClientReturnForms(Client client, ReturnForm returnForm) {
+    public ClientReturnForms(Client client, ReturnForm returnForm, String assessmentYear) {
         this.client = client;
         this.returnForm = returnForm;
-        this.id = new ClientReturnFormsId(client.getId(), returnForm.getFormName());
+        this.id = new ClientReturnFormsId(client.getId(), returnForm.getFormName(), assessmentYear);
     }
 
     @Override

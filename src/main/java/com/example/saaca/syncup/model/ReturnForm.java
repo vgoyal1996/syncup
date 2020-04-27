@@ -13,9 +13,7 @@ import org.hibernate.annotations.Cache;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "return_forms")
@@ -49,8 +47,8 @@ public class ReturnForm implements Serializable {
             cascade = {CascadeType.MERGE, CascadeType.REMOVE},
             orphanRemoval = true
     )
-    @JsonIgnore
-    private List<ClientReturnForms> applicableReturnForms = new ArrayList<>();
+    @JsonBackReference
+    private Set<ClientReturnForms> applicableReturnForms = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

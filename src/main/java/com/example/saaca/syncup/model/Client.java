@@ -11,10 +11,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "client_credentials")
@@ -82,14 +79,13 @@ public class Client implements Serializable {
             cascade = {CascadeType.MERGE, CascadeType.REMOVE},
             orphanRemoval = true
     )
-    @JsonIgnore
-    private List<ClientReturnForms> assignedReturnForms = new ArrayList<>();
+    private Set<ClientReturnForms> assignedReturnForms = new HashSet<>();
 
-    public void addReturnForm(ReturnForm returnForm){
-        ClientReturnForms clientReturnForms = new ClientReturnForms(this, returnForm);
+    public void addClientReturnForm(ClientReturnForms clientReturnForms, ReturnForm returnForm) {
         assignedReturnForms.add(clientReturnForms);
         returnForm.getApplicableReturnForms().add(clientReturnForms);
     }
+
 
     @Override
     public boolean equals(Object o) {

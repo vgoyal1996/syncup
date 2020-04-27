@@ -20,16 +20,20 @@ public class ClientReturnFormsId implements Serializable {
     @Column(name = "form_name", updatable = false)
     private String formName;
 
+    @Column(name = "assessment_year")
+    private String assessmentYear;
+
     private ClientReturnFormsId() {}
 
-    public ClientReturnFormsId(int clientId, String formName) {
+    public ClientReturnFormsId(int clientId, String formName, String assessmentYear) {
         this.clientId = clientId;
         this.formName = formName;
+        this.assessmentYear = assessmentYear;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientId, formName);
+        return Objects.hash(clientId, formName, assessmentYear);
     }
 
     @Override
@@ -38,6 +42,7 @@ public class ClientReturnFormsId implements Serializable {
             return false;
         }
         final ClientReturnFormsId temp = (ClientReturnFormsId) obj;
-        return Objects.equals(clientId, temp.clientId) && Objects.equals(formName, temp.formName);
+        return Objects.equals(clientId, temp.clientId) && Objects.equals(formName, temp.formName) &&
+                Objects.equals(assessmentYear, temp.assessmentYear);
     }
 }
