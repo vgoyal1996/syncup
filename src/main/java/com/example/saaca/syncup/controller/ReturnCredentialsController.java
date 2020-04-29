@@ -1,7 +1,6 @@
 package com.example.saaca.syncup.controller;
 
 import com.example.saaca.syncup.dao.ClientRepository;
-import com.example.saaca.syncup.dao.ClientReturnFormsRepository;
 import com.example.saaca.syncup.dao.ReturnCredentialsRepository;
 import com.example.saaca.syncup.dao.ReturnFormRepository;
 import com.example.saaca.syncup.model.Client;
@@ -12,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/return-credentials")
@@ -27,9 +29,6 @@ public class ReturnCredentialsController {
 
     @Autowired
     private ClientRepository clientRepository;
-
-    @Autowired
-    private ClientReturnFormsRepository clientReturnFormsRepository;
 
     @PostMapping("/{client_id}")
     @Transactional
