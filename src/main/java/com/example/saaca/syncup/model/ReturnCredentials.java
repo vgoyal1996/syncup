@@ -90,7 +90,9 @@ public class ReturnCredentials implements Serializable {
     }
 
     public void removeClientReturnForm(ClientReturnForms clientReturnForms) {
-        returnFormsList.remove(clientReturnForms);
-        clientReturnForms.setReturnCredentials(null);
+        if (returnFormsList.contains(clientReturnForms)) {
+            returnFormsList.remove(clientReturnForms);
+            clientReturnForms.setReturnCredentials(null);
+        }
     }
 }

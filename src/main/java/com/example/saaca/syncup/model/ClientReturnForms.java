@@ -3,8 +3,6 @@ package com.example.saaca.syncup.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -12,26 +10,28 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@Table(name = "client_return_form_applicability")
+@Table(name = "client_return_form_applicability",
+        uniqueConstraints=
+        @UniqueConstraint(columnNames={"form_name", "assessment_year", "return_credentials_id"})
+)
 public class ClientReturnForms {
 
-    @EmbeddedId
-    @NotFound(action = NotFoundAction.IGNORE)
-    private ClientReturnFormsId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="return_credentials_id")
-    @JsonBackReference
+    @JoinColumn(name = "return_credentials_id", referencedColumnName = "return_id")
+    @JsonBackReference(value = "return-credentials-reference")
     private ReturnCredentials returnCredentials;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id", referencedColumnName = "id", updatable = false, insertable = false)
-    @JsonBackReference
-    private Client client;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "form_name", referencedColumnName = "form_name", updatable = false, insertable = false)
+    @JoinColumn(name = "form_name", referencedColumnName = "form_name")
     private ReturnForm returnForm;
+
+    @Column(name = "assessment_year")
+    private String assessmentYear;
 
     @Column(name = "acknowledgement_no")
     private String acknowledgementNo;
@@ -44,10 +44,8 @@ public class ClientReturnForms {
 
     private ClientReturnForms() {}
 
-    public ClientReturnForms(Client client, ReturnForm returnForm, String assessmentYear) {
-        this.client = client;
-        this.returnForm = returnForm;
-        this.id = new ClientReturnFormsId(client.getId(), returnForm.getFormName(), assessmentYear);
+    public ClientReturnForms(String assessmentYear) {
+        this.assessmentYear = assessmentYear;
     }
 
     @Override
@@ -55,12 +53,13 @@ public class ClientReturnForms {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ClientReturnForms that = (ClientReturnForms) o;
-        return Objects.equals(client, that.client) &&
-                Objects.equals(returnForm, that.returnForm);
+        return Objects.equals(returnForm, that.returnForm) &&
+                Objects.equals(assessmentYear, that.assessmentYear) &&
+                Objects.equals(returnCredentials, that.returnCredentials);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(client, returnForm);
+        return Objects.hash(returnForm, assessmentYear, returnCredentials);
     }
 }

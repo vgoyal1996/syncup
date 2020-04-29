@@ -12,4 +12,6 @@ public interface ReturnCredentialsRepository extends JpaRepository<ReturnCredent
 
     @Query("select r from ReturnCredentials r where r.assessmentYear = :assessmentYear and r.client.id = :id")
     List<ReturnCredentials> findByAssessmentYearAndId(final String assessmentYear, final int id);
+
+    ReturnCredentials findByAssessmentYearAndReturnId(final String assessmentYear, final int returnId);
 }

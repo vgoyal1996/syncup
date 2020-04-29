@@ -46,6 +46,18 @@ public class ReturnForm implements Serializable {
     @JsonBackReference
     private Set<ClientReturnForms> applicableReturnForms = new HashSet<>();
 
+    public void addClientReturnForm(ClientReturnForms clientReturnForm) {
+        applicableReturnForms.add(clientReturnForm);
+        clientReturnForm.setReturnForm(this);
+    }
+
+    public void removeClientReturnForm(ClientReturnForms clientReturnForm) {
+        if (applicableReturnForms.contains(clientReturnForm)) {
+            applicableReturnForms.remove(clientReturnForm);
+            clientReturnForm.setReturnForm(null);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

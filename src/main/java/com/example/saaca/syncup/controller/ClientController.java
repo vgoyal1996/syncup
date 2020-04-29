@@ -2,15 +2,12 @@ package com.example.saaca.syncup.controller;
 
 import com.example.saaca.syncup.dao.ClientRepository;
 import com.example.saaca.syncup.model.Client;
-import com.example.saaca.syncup.model.ClientReturnForms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/client")
@@ -35,15 +32,6 @@ public class ClientController {
     @GetMapping("{id}")
     public Client getClient(@PathVariable(value = "id")final int id) {
         return clientRepository.findById(id).get();
-    }
-    
-    @GetMapping("/assigned-return-forms/{assessmentYear}/{id}")
-    public List<ClientReturnForms> getAssignedReturnFormsForClientId(@PathVariable(value = "assessmentYear")final String assessmentYear,
-            @PathVariable(value = "id")final int id) {
-        Client client = clientRepository.findById(id).get();
-        Set<ClientReturnForms> assignedForms = client.getAssignedReturnForms();
-        return assignedForms.stream().filter(item -> item.getId().getAssessmentYear().equals(assessmentYear))
-                .collect(Collectors.toList());
     }
 
     @DeleteMapping("")

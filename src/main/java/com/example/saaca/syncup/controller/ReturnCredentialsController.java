@@ -1,6 +1,7 @@
 package com.example.saaca.syncup.controller;
 
 import com.example.saaca.syncup.dao.ClientRepository;
+import com.example.saaca.syncup.dao.ClientReturnFormsRepository;
 import com.example.saaca.syncup.dao.ReturnCredentialsRepository;
 import com.example.saaca.syncup.dao.ReturnFormRepository;
 import com.example.saaca.syncup.model.Client;
@@ -14,7 +15,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1/returnCredentials")
+@RequestMapping("/api/v1/return-credentials")
 @CrossOrigin
 public class ReturnCredentialsController {
 
@@ -26,6 +27,9 @@ public class ReturnCredentialsController {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private ClientReturnFormsRepository clientReturnFormsRepository;
 
     @PostMapping("/{client_id}")
     @Transactional
@@ -41,8 +45,9 @@ public class ReturnCredentialsController {
         Client client = clientRepository.findById(clientId).get();
         List<ReturnForm> applicableForms = returnFormRepository.findByFormNames(applicableFormNames);
         for (ReturnForm applicableForm: applicableForms) {
-            ClientReturnForms clientReturnForm = new ClientReturnForms(client, applicableForm, returnCredentials.getAssessmentYear());
+            ClientReturnForms clientReturnForm = new ClientReturnForms(returnCredentials.getAssessmentYear());
             returnCredentials.addClientReturnForm(clientReturnForm);
+            applicableForm.addClientReturnForm(clientReturnForm);
         }
         client.addReturnCredential(returnCredentials);
     }
@@ -52,5 +57,52 @@ public class ReturnCredentialsController {
             @PathVariable(value = "assessment_year")final String assessmentYear,
             @PathVariable(value = "id")final int id) {
         return returnCredentialsRepository.findByAssessmentYearAndId(assessmentYear, id);
+    }
+
+    @PutMapping("/{assessment_year}/{return_id}")
+    @Transactional
+    public boolean updateReturnCredentials(@PathVariable(value = "assessment_year")final String assessmentYear,
+                                           @PathVariable(value = "return_id")final int returnId,
+                                           @RequestBody final ReturnCredentials newReturnCredentials) {
+        ReturnCredentials oldCreds = returnCredentialsRepository
+                .findByAssessmentYearAndReturnId(assessmentYear, returnId);
+        if (oldCreds == null) {
+            return false;
+        }
+        oldCreds.setAssessmentYear(newReturnCredentials.getAssessmentYear());
+        oldCreds.setReturnType(newReturnCredentials.getReturnType());
+        oldCreds.setGstNo(newReturnCredentials.getGstNo());
+        oldCreds.setTanNo(newReturnCredentials.getTanNo());
+        oldCreds.setFlatNo(newReturnCredentials.getFlatNo());
+        oldCreds.setArea(newReturnCredentials.getArea());
+        oldCreds.setCity(newReturnCredentials.getCity());
+        oldCreds.setState(newReturnCredentials.getState());
+        oldCreds.setPin(newReturnCredentials.getPin());
+        oldCreds.setUserId(newReturnCredentials.getUserId());
+        oldCreds.setPassword(newReturnCredentials.getPassword());
+        oldCreds.setTracesUserId(newReturnCredentials.getTracesUserId());
+        oldCreds.setTracesPassword(newReturnCredentials.getTracesPassword());
+        List<String> applicableFormNames = newReturnCredentials.getApplicableReturnForms();
+        List<ReturnForm> applicableForms = returnFormRepository.findByFormNames(applicableFormNames);
+        Client client = clientRepository.findById(oldCreds.getClient().getId()).get();
+        Set<ClientReturnForms> newForms = new HashSet<>();
+        for (ReturnForm applicableForm: applicableForms) {
+            ClientReturnForms clientReturnForm = new ClientReturnForms(newReturnCredentials.getAssessmentYear());
+            clientReturnForm.setReturnForm(applicableForm);
+            clientReturnForm.setReturnCredentials(oldCreds);
+            newForms.add(clientReturnForm);
+        }
+        Set<ClientReturnForms> oldSet = new HashSet<>(oldCreds.getReturnFormsList());
+        oldSet.removeAll(newForms);
+        oldCreds.getReturnFormsList().removeAll(oldSet);
+        for (ReturnForm applicableForm: applicableForms) {
+            applicableForm.getApplicableReturnForms().removeAll(oldSet);
+        }
+        newForms.removeAll(oldCreds.getReturnFormsList());
+        for (ClientReturnForms form: newForms) {
+            oldCreds.addClientReturnForm(form);
+            form.getReturnForm().addClientReturnForm(form);
+        }
+        return true;
     }
 }

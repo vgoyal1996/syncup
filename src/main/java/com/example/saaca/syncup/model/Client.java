@@ -1,7 +1,7 @@
 package com.example.saaca.syncup.model;
 
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -10,7 +10,9 @@ import lombok.ToString;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "client_credentials")
@@ -76,15 +78,8 @@ public class Client implements Serializable {
     @OneToMany(mappedBy = "client",
                 cascade = CascadeType.ALL,
                 orphanRemoval = true)
-    @JsonBackReference
+    @JsonBackReference(value = "return-credentials-reference")
     private Set<ReturnCredentials> returnCredentialsList = new HashSet<>();
-    @OneToMany(
-            mappedBy = "client",
-            cascade = {CascadeType.MERGE, CascadeType.REMOVE},
-            orphanRemoval = true
-    )
-    @JsonBackReference
-    private Set<ClientReturnForms> assignedReturnForms = new HashSet<>();
 
     public void addReturnCredential(ReturnCredentials returnCredential) {
         returnCredentialsList.add(returnCredential);
@@ -92,13 +87,10 @@ public class Client implements Serializable {
     }
 
     public void removeReturnCredential(ReturnCredentials returnCredential) {
-        returnCredentialsList.remove(returnCredential);
-        returnCredential.setClient(null);
-    }
-
-    public void addClientReturnForm(ClientReturnForms clientReturnForms, ReturnForm returnForm) {
-        assignedReturnForms.add(clientReturnForms);
-        returnForm.getApplicableReturnForms().add(clientReturnForms);
+        if (returnCredentialsList.contains(returnCredential)) {
+            returnCredentialsList.remove(returnCredential);
+            returnCredential.setClient(null);
+        }
     }
 
 
@@ -113,19 +105,5 @@ public class Client implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    public void removeReturnForm(ReturnForm returnForm){
-        for(Iterator<ClientReturnForms> iterator = assignedReturnForms.iterator();
-            iterator.hasNext();) {
-           ClientReturnForms clientReturnForms = iterator.next();
-           if(clientReturnForms.getClient().equals(this) &&
-                clientReturnForms.getReturnForm().equals(returnForm)) {
-               iterator.remove();
-               clientReturnForms.getReturnForm().getApplicableReturnForms().remove(clientReturnForms);
-               clientReturnForms.setClient(null);
-               clientReturnForms.setReturnForm(null);
-           }
-        }
     }
 }
