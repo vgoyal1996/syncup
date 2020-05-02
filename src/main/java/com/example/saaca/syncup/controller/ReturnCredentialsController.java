@@ -3,10 +3,7 @@ package com.example.saaca.syncup.controller;
 import com.example.saaca.syncup.dao.ClientRepository;
 import com.example.saaca.syncup.dao.ReturnCredentialsRepository;
 import com.example.saaca.syncup.dao.ReturnFormRepository;
-import com.example.saaca.syncup.model.Client;
-import com.example.saaca.syncup.model.ClientReturnForms;
-import com.example.saaca.syncup.model.ReturnCredentials;
-import com.example.saaca.syncup.model.ReturnForm;
+import com.example.saaca.syncup.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +53,26 @@ public class ReturnCredentialsController {
             @PathVariable(value = "assessment_year")final String assessmentYear,
             @PathVariable(value = "id")final int id) {
         return returnCredentialsRepository.findByAssessmentYearAndId(assessmentYear, id);
+    }
+
+    @PutMapping("/client-return-form/{assessment_year}/{return_id}")
+    public boolean updateClientReturnForm(@PathVariable(value = "assessment_year")final String assessmentYear,
+                                          @PathVariable(value = "return_id")final int returnId,
+                                          @RequestBody final ClientReturnFormData clientReturnFormData) {
+        ReturnCredentials credentials = returnCredentialsRepository.findByAssessmentYearAndReturnId(assessmentYear, returnId);
+        if (credentials == null) {
+            return false;
+        }
+        for (ClientReturnForms form: credentials.getReturnFormsList()) {
+            if (form.getReturnForm().getFormName().equals(clientReturnFormData.getFormName())) {
+                form.setAcknowledgementNo(clientReturnFormData.getAcknowledgementNo());
+                form.setDateOfFiling(clientReturnFormData.getDateOfFiling());
+                form.setDateOfPhysicalDeposit(clientReturnFormData.getDateOfPhysicalDeposit());
+                returnCredentialsRepository.save(credentials);
+                return true;
+            }
+        }
+        return false;
     }
 
     @PutMapping("/{assessment_year}/{return_id}")
