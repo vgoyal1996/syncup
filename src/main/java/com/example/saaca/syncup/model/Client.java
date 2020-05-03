@@ -1,8 +1,7 @@
 package com.example.saaca.syncup.model;
 
 
-import com.fasterxml.jackson.annotation.*;
-import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -11,10 +10,9 @@ import lombok.ToString;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "client_credentials")
@@ -77,19 +75,24 @@ public class Client implements Serializable {
     private String responsiblePersonAadhaar;
     @Column(name = "CIN")
     private String cin;
-    @OneToMany(
-            mappedBy = "client",
-            cascade = {CascadeType.MERGE, CascadeType.REMOVE},
-            orphanRemoval = true
-    )
-    @JsonIgnore
-    private List<ClientReturnForms> assignedReturnForms = new ArrayList<>();
+    @OneToMany(mappedBy = "client",
+                cascade = CascadeType.ALL,
+                orphanRemoval = true)
+    @JsonBackReference(value = "return-credentials-reference")
+    private Set<ReturnCredentials> returnCredentialsList = new HashSet<>();
 
-    public void addReturnForm(ReturnForm returnForm){
-        ClientReturnForms clientReturnForms = new ClientReturnForms(this, returnForm);
-        assignedReturnForms.add(clientReturnForms);
-        returnForm.getApplicableReturnForms().add(clientReturnForms);
+    public void addReturnCredential(ReturnCredentials returnCredential) {
+        returnCredentialsList.add(returnCredential);
+        returnCredential.setClient(this);
     }
+
+    public void removeReturnCredential(ReturnCredentials returnCredential) {
+        if (returnCredentialsList.contains(returnCredential)) {
+            returnCredentialsList.remove(returnCredential);
+            returnCredential.setClient(null);
+        }
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -102,19 +105,5 @@ public class Client implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    public void removeReturnForm(ReturnForm returnForm){
-        for(Iterator<ClientReturnForms> iterator = assignedReturnForms.iterator();
-            iterator.hasNext();) {
-           ClientReturnForms clientReturnForms = iterator.next();
-           if(clientReturnForms.getClient().equals(this) &&
-                clientReturnForms.getReturnForm().equals(returnForm)) {
-               iterator.remove();
-               clientReturnForms.getReturnForm().getApplicableReturnForms().remove(clientReturnForms);
-               clientReturnForms.setClient(null);
-               clientReturnForms.setReturnForm(null);
-           }
-        }
     }
 }

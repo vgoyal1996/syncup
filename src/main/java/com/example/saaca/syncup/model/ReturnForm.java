@@ -5,17 +5,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.NaturalIdCache;
-import org.hibernate.annotations.Cache;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "return_forms")
@@ -46,11 +40,23 @@ public class ReturnForm implements Serializable {
     private String revisedDueDateOfFiling;
     @OneToMany(
             mappedBy = "returnForm",
-            cascade = {CascadeType.MERGE, CascadeType.REMOVE},
+            cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @JsonIgnore
-    private List<ClientReturnForms> applicableReturnForms = new ArrayList<>();
+    @JsonBackReference
+    private Set<ClientReturnForms> applicableReturnForms = new HashSet<>();
+
+    public void addClientReturnForm(ClientReturnForms clientReturnForm) {
+        applicableReturnForms.add(clientReturnForm);
+        clientReturnForm.setReturnForm(this);
+    }
+
+    public void removeClientReturnForm(ClientReturnForms clientReturnForm) {
+        if (applicableReturnForms.contains(clientReturnForm)) {
+            applicableReturnForms.remove(clientReturnForm);
+            clientReturnForm.setReturnForm(null);
+        }
+    }
 
     @Override
     public boolean equals(Object o) {

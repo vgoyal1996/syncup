@@ -18,6 +18,7 @@ public class ClientController {
     private ClientRepository clientRepository;
 
     @PostMapping("/add")
+    @Transactional
     public int createClient(@RequestBody final Client client){
         Client resultantModel = clientRepository.save(client);
         return resultantModel.getId();
@@ -28,9 +29,14 @@ public class ClientController {
         return clientRepository.findAll();
     }
 
+    @GetMapping("{id}")
+    public Client getClient(@PathVariable(value = "id")final int id) {
+        return clientRepository.findById(id).get();
+    }
+
     @DeleteMapping("")
     @Transactional
-    public int deleteReturnForms(@RequestBody final String[] clientCodeList) {
+    public int deleteClients(@RequestBody final String[] clientCodeList) {
         return clientRepository.deleteClientsByClientCodes(Arrays.asList(clientCodeList));
     }
 

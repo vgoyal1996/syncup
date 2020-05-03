@@ -25,6 +25,7 @@ CREATE table client_credentials(
 CREATE TABLE return_credentials(
 	return_id int not null AUTO_INCREMENT,
 	id int not null,
+	assessment_year VARCHAR(15) not null,
 	return_type VARCHAR(10) not null,
 	GST_no VARCHAR(20),
 	TAN_no VARCHAR(20),
@@ -62,13 +63,19 @@ CREATE TABLE return_forms(
 )ENGINE=InnoDB;
 
 CREATE TABLE client_return_form_applicability(
-	client_id int NOT NULL,
+    id int NOT NULL AUTO_INCREMENT,
     form_name VARCHAR(50) NOT NULL,
-    INDEX(client_id),
+    assessment_year VARCHAR(15) NOT NULL,
+    return_credentials_id INT NOT NULL,
+    acknowledgement_no VARCHAR(20),
+    date_of_filing DATETIME,
+    date_of_physical_deposit DATETIME,
     INDEX(form_name),
-    FOREIGN KEY(client_id) REFERENCES client_credentials(id)
-    ON UPDATE CASCADE ON DELETE CASCADE,
+    INDEX(assessment_year),
     FOREIGN KEY(form_name) REFERENCES return_forms(form_name)
     ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY(client_id, form_name)
+    FOREIGN KEY(return_credentials_id) REFERENCES return_credentials(return_id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY(id),
+    UNIQUE INDEX(form_name, assessment_year, return_credentials_id)
 )ENGINE=InnoDB;
