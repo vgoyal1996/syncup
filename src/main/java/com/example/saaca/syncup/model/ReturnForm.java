@@ -35,9 +35,6 @@ public class ReturnForm implements Serializable {
     @Column(name = "periodicity")
     @NotNull
     private String periodicity;
-    @Column(name = "revised_due_date_of_filing")
-    @NotNull
-    private String revisedDueDateOfFiling;
     @OneToMany(
             mappedBy = "returnForm",
             cascade = CascadeType.ALL,
@@ -45,6 +42,12 @@ public class ReturnForm implements Serializable {
     )
     @JsonBackReference
     private Set<ClientReturnForms> applicableReturnForms = new HashSet<>();
+    @OneToMany(
+            mappedBy = "form",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<DueDateScheduler> dueDateSchedulerSet = new HashSet<>();
 
     public void addClientReturnForm(ClientReturnForms clientReturnForm) {
         applicableReturnForms.add(clientReturnForm);
@@ -55,6 +58,18 @@ public class ReturnForm implements Serializable {
         if (applicableReturnForms.contains(clientReturnForm)) {
             applicableReturnForms.remove(clientReturnForm);
             clientReturnForm.setReturnForm(null);
+        }
+    }
+
+    public void addDueDateScheduler(DueDateScheduler dueDateScheduler) {
+        dueDateSchedulerSet.add(dueDateScheduler);
+        dueDateScheduler.setForm(this);
+    }
+
+    public void removeDueDateScheduler(DueDateScheduler dueDateScheduler) {
+        if (dueDateSchedulerSet.contains(dueDateScheduler)) {
+            dueDateSchedulerSet.remove(dueDateScheduler);
+            dueDateScheduler.setForm(null);
         }
     }
 

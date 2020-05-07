@@ -1,0 +1,10 @@
+DELIMITER |
+
+CREATE EVENT IF NOT EXISTS delete_rows_from_scheduler_event
+ON SCHEDULE EVERY 1 MONTH STARTS '2020-05-06 01:00:00'
+ON COMPLETION PRESERVE ENABLE
+DO BEGIN
+	DELETE from due_date_scheduler where to_be_delete = 1;
+END |
+
+DELIMITER ;

@@ -1,12 +1,14 @@
 package com.example.saaca.syncup.controller;
 
 import com.example.saaca.syncup.dao.ReturnFormRepository;
+import com.example.saaca.syncup.model.DueDateScheduler;
 import com.example.saaca.syncup.model.ReturnForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -18,8 +20,14 @@ public class ReturnFormController {
     private ReturnFormRepository returnFormRepository;
 
     @PostMapping("/add")
-    public void createReturnForm(@RequestBody final ReturnForm returnForm){
+    @Transactional
+    public ReturnForm createReturnForm(@RequestBody final ReturnForm returnForm){
+        DueDateScheduler scheduler = new DueDateScheduler();
+        scheduler.calculateStartDateAndEndDate(returnForm);
+        scheduler.setToBeDelete(0);
+        returnForm.addDueDateScheduler(scheduler);
         returnFormRepository.save(returnForm);
+        return returnForm;
     }
 
     @GetMapping("/get/{returnType}")
@@ -28,21 +36,25 @@ public class ReturnFormController {
     }
 
     @PutMapping("/{returnType}/{returnName}")
-    public boolean updateReturnForm(@PathVariable(value = "returnType")final String returnType,
-                                    @PathVariable(value = "returnName")final String returnName,
-                                    @RequestBody final ReturnForm newReturnForm){
+    public ReturnForm updateReturnForm(@PathVariable(value = "returnType")final String returnType,
+                                   @PathVariable(value = "returnName")final String returnName,
+                                   @RequestBody final ReturnForm newReturnForm){
         ReturnForm oldReturnForm = returnFormRepository.findByReturnTypeAndReturnForm(returnType, returnName);
         if (oldReturnForm == null) {
-            return false;
+            return null;
         }
         oldReturnForm.setFormName(newReturnForm.getFormName());
         oldReturnForm.setReturnType(newReturnForm.getReturnType());
-        oldReturnForm.setPeriodicity(newReturnForm.getPeriodicity());
-        oldReturnForm.setDueDateOfFiling(newReturnForm.getDueDateOfFiling());
-        oldReturnForm.setRevisedDueDateOfFiling(newReturnForm.getRevisedDueDateOfFiling());
+        if (!oldReturnForm.getPeriodicity().equals(newReturnForm.getPeriodicity())) {
+            oldReturnForm.setPeriodicity(newReturnForm.getPeriodicity());
+            DueDateScheduler scheduler = new DueDateScheduler();
+            scheduler.calculateStartDateAndEndDate(oldReturnForm);
+            scheduler.setToBeDelete(0);
+            oldReturnForm.getDueDateSchedulerSet().clear();
+            oldReturnForm.addDueDateScheduler(scheduler);
+        }
 
-        ReturnForm result = returnFormRepository.save(oldReturnForm);
-        return true;
+        return returnFormRepository.save(oldReturnForm);
     }
 
     @DeleteMapping("/{returnType}")
@@ -57,4 +69,21 @@ public class ReturnFormController {
         return returnFormRepository.findAll();
     }
 
+    @PutMapping("/revised-due-date/{form_name}")
+    public ReturnForm addRevisedDueDateOfFiling(@PathVariable(value = "form_name")final String formName,
+                                             @RequestBody final DueDateScheduler dueDateScheduler) {
+        List<ReturnForm> returnForms = returnFormRepository.findByFormNames(Arrays.asList(formName));
+        if (returnForms == null) {
+            return null;
+        }
+        ReturnForm returnForm = returnForms.get(0);
+        Date currentDate = new Date();
+        Date revisedDueDate = dueDateScheduler.getRevisedDueDateOfFiling();
+        for (DueDateScheduler scheduler: returnForm.getDueDateSchedulerSet()) {
+            if (scheduler.getToBeDelete() == 0) {
+                scheduler.setRevisedDueDateOfFiling(revisedDueDate);
+            }
+        }
+        return returnFormRepository.save(returnForm);
+    }
 }
