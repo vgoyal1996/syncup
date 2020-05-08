@@ -54,9 +54,8 @@ CREATE TABLE return_forms(
 	form_id int not null AUTO_INCREMENT,
 	form_name VARCHAR(50) not null,
 	return_type VARCHAR(10) not null,
-	due_date_of_filing DATETIME not null,
+	due_date_of_filing DATE not null,
 	periodicity VARCHAR(20) not null,
-	revised_due_date_of_filing DATETIME not null,
 	UNIQUE INDEX(form_name),
 	INDEX(return_type),
 	PRIMARY KEY(form_id)
@@ -78,4 +77,17 @@ CREATE TABLE client_return_form_applicability(
     ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY(id),
     UNIQUE INDEX(form_name, assessment_year, return_credentials_id)
+)ENGINE=InnoDB;
+
+CREATE TABLE due_date_scheduler(
+    id int NOT NULL AUTO_INCREMENT,
+    form_name VARCHAR(50) NOT NULL,
+    from_date DATE NOT NULL,
+    to_date DATE NOT NULL,
+    due_date_of_filing DATE,
+    revised_due_date_of_filing DATE,
+    to_be_delete INT NOT NULL default 0,
+    PRIMARY KEY(id),
+    FOREIGN KEY(form_name) REFERENCES return_forms(form_name)
+    ON UPDATE CASCADE ON DELETE CASCADE
 )ENGINE=InnoDB;
