@@ -7,7 +7,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,21 +40,12 @@ public class DueDateScheduler {
     private int toBeDelete;
 
     public void calculateStartDateAndEndDate(ReturnForm returnForm) {
-        Date dueDate = null;
         String periodicity = returnForm.getPeriodicity();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            dueDate = df.parse(returnForm.getDueDateOfFiling());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
         Calendar c = Calendar.getInstance();
         Date currentDate = new Date();
         Date startDate = currentDate;
         Date endDate = currentDate;
-        c.setTime(dueDate);
-        int dueDateDay = c.get(Calendar.DAY_OF_MONTH);
-        int dueDateMonth = c.get(Calendar.MONTH);
         c.setTime(currentDate);
         int currentDay = c.get(Calendar.DAY_OF_MONTH);
         int currentMonth = c.get(Calendar.MONTH);
@@ -70,7 +60,14 @@ public class DueDateScheduler {
             c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
             endDate = c.getTime();
             c.setTime(currentDate);
-            c.set(Calendar.DAY_OF_MONTH, dueDateDay);
+            c.set(Calendar.DAY_OF_MONTH, 1);
+            if (returnForm.getMonthlyDayOccurrence() == 31) {
+                c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+            } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY && returnForm.getMonthlyDayOccurrence() >= 28) {
+                c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+            } else {
+                c.set(Calendar.DAY_OF_MONTH, returnForm.getMonthlyDayOccurrence());
+            }
             this.setDueDateOfFiling(c.getTime());
         } else if (periodicity.equals("yearly")) {
             c.setTime(startDate);
@@ -79,8 +76,16 @@ public class DueDateScheduler {
             c.setTime(endDate);
             c.set(currentYear, Calendar.MARCH, 31);
             endDate = c.getTime();
-            c.setTime(currentDate);
-            c.set(currentYear, dueDateMonth, dueDateDay);
+            c.setTime(endDate);
+            c.set(Calendar.DAY_OF_MONTH, 1);
+            c.add(Calendar.MONTH, returnForm.getYearlyMonthOccurrence());
+            if (returnForm.getYearlyDayOccurrence() == 31) {
+                c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+            } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY && returnForm.getYearlyDayOccurrence() >= 28) {
+                c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+            } else {
+                c.set(Calendar.DAY_OF_MONTH, returnForm.getYearlyDayOccurrence());
+            }
             this.setDueDateOfFiling(c.getTime());
         } else {
             if (currentMonth >= Calendar.APRIL && currentMonth <= Calendar.JUNE) {
@@ -90,8 +95,16 @@ public class DueDateScheduler {
                 c.setTime(endDate);
                 c.set(currentYear, Calendar.JUNE, 30);
                 endDate = c.getTime();
-                c.setTime(currentDate);
-                c.set(currentYear, Calendar.JULY, dueDateDay);
+                c.setTime(endDate);
+                c.set(Calendar.DAY_OF_MONTH, 1);
+                c.add(Calendar.MONTH, returnForm.getFirstQuarterMonthOccurrence());
+                if (returnForm.getFirstQuarterDayOccurrence() == 31) {
+                    c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY && returnForm.getFirstQuarterDayOccurrence() >= 28) {
+                    c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+                } else {
+                    c.set(Calendar.DAY_OF_MONTH, returnForm.getFirstQuarterDayOccurrence());
+                }
                 this.setDueDateOfFiling(c.getTime());
             } else if (currentMonth >= Calendar.JULY && currentMonth <= Calendar.SEPTEMBER) {
                 c.setTime(startDate);
@@ -100,8 +113,16 @@ public class DueDateScheduler {
                 c.setTime(endDate);
                 c.set(currentYear, Calendar.SEPTEMBER, 30);
                 endDate = c.getTime();
-                c.setTime(currentDate);
-                c.set(currentYear, Calendar.OCTOBER, dueDateDay);
+                c.setTime(endDate);
+                c.set(Calendar.DAY_OF_MONTH, 1);
+                c.add(Calendar.MONTH, returnForm.getSecondQuarterMonthOccurrence());
+                if (returnForm.getSecondQuarterDayOccurrence() == 31) {
+                    c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY && returnForm.getSecondQuarterDayOccurrence() >= 28) {
+                    c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+                } else {
+                    c.set(Calendar.DAY_OF_MONTH, returnForm.getSecondQuarterDayOccurrence());
+                }
                 this.setDueDateOfFiling(c.getTime());
             } else if (currentMonth >= Calendar.OCTOBER && currentMonth <= Calendar.DECEMBER) {
                 c.setTime(startDate);
@@ -110,31 +131,35 @@ public class DueDateScheduler {
                 c.setTime(endDate);
                 c.set(currentYear, Calendar.DECEMBER, 31);
                 endDate = c.getTime();
-                c.setTime(currentDate);
-                c.set(currentYear, Calendar.JANUARY, dueDateDay);
+                c.setTime(endDate);
+                c.set(Calendar.DAY_OF_MONTH, 1);
+                c.add(Calendar.MONTH, returnForm.getThirdQuarterMonthOccurrence());
+                if (returnForm.getThirdQuarterDayOccurrence() == 31) {
+                    c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY && returnForm.getThirdQuarterDayOccurrence() >= 28) {
+                    c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+                } else {
+                    c.set(Calendar.DAY_OF_MONTH, returnForm.getThirdQuarterDayOccurrence());
+                }
                 this.setDueDateOfFiling(c.getTime());
             } else {
-                if (returnForm.getReturnType().equals("tds")) {
-                    c.setTime(startDate);
-                    c.set(currentYear, Calendar.JANUARY, 1);
-                    startDate = c.getTime();
-                    c.setTime(endDate);
-                    c.set(currentYear, Calendar.MARCH, 30);
-                    endDate = c.getTime();
-                    c.setTime(currentDate);
-                    c.set(currentYear, Calendar.MAY, dueDateDay);
-                    this.setDueDateOfFiling(c.getTime());
+                c.setTime(startDate);
+                c.set(currentYear, Calendar.JANUARY, 1);
+                startDate = c.getTime();
+                c.setTime(endDate);
+                c.set(currentYear, Calendar.MARCH, 30);
+                endDate = c.getTime();
+                c.setTime(endDate);
+                c.set(Calendar.DAY_OF_MONTH, 1);
+                c.add(Calendar.MONTH, returnForm.getFourthQuarterMonthOccurrence());
+                if (returnForm.getFourthQuarterDayOccurrence() == 31) {
+                    c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY && returnForm.getFourthQuarterDayOccurrence() >= 28) {
+                    c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
                 } else {
-                    c.setTime(startDate);
-                    c.set(currentYear, Calendar.JANUARY, 1);
-                    startDate = c.getTime();
-                    c.setTime(endDate);
-                    c.set(currentYear, Calendar.MARCH, 30);
-                    endDate = c.getTime();
-                    c.setTime(currentDate);
-                    c.set(currentYear, Calendar.APRIL, dueDateDay);
-                    this.setDueDateOfFiling(c.getTime());
+                    c.set(Calendar.DAY_OF_MONTH, returnForm.getFourthQuarterDayOccurrence());
                 }
+                this.setDueDateOfFiling(c.getTime());
             }
         }
         this.setFromDate(startDate);
