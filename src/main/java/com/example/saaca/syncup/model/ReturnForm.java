@@ -29,12 +29,31 @@ public class ReturnForm implements Serializable {
     @Column(name = "return_type")
     @NotNull
     private String returnType;
-    @Column(name = "due_date_of_filing")
-    @NotNull
-    private String dueDateOfFiling;
     @Column(name = "periodicity")
     @NotNull
     private String periodicity;
+    @Column(name = "monthly_day_occurrence")
+    private int monthlyDayOccurrence;
+    @Column(name = "yearly_day_occurrence")
+    private int yearlyDayOccurrence;
+    @Column(name = "first_quarter_day_occurrence")
+    private int firstQuarterDayOccurrence;
+    @Column(name = "second_quarter_day_occurrence")
+    private int secondQuarterDayOccurrence;
+    @Column(name = "third_quarter_day_occurrence")
+    private int thirdQuarterDayOccurrence;
+    @Column(name = "fourth_quarter_day_occurrence")
+    private int fourthQuarterDayOccurrence;
+    @Column(name = "yearly_month_occurrence")
+    private int yearlyMonthOccurrence;
+    @Column(name = "first_quarter_month_occurrence")
+    private int firstQuarterMonthOccurrence;
+    @Column(name = "second_quarter_month_occurrence")
+    private int secondQuarterMonthOccurrence;
+    @Column(name = "third_quarter_month_occurrence")
+    private int thirdQuarterMonthOccurrence;
+    @Column(name = "fourth_quarter_month_occurrence")
+    private int fourthQuarterMonthOccurrence;
     @OneToMany(
             mappedBy = "returnForm",
             cascade = CascadeType.ALL,
