@@ -1,4 +1,5 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_new_due_dates`(IN form_name VARCHAR(50), IN from_date DATE, IN to_date DATE, IN due_date_of_filing DATE)
+DELIMITER //
+CREATE PROCEDURE `insert_new_due_dates`(IN form_name VARCHAR(50), IN from_date DATE, IN to_date DATE, IN due_date_of_filing DATE)
 BEGIN
 	DECLARE new_from_date date;
     DECLARE new_to_date date;
@@ -31,4 +32,5 @@ BEGIN
     END IF;
     insert into due_date_scheduler (form_name, from_date, to_date, due_date_of_filing)
     VALUES (form_name, new_from_date, new_to_date, new_due_date_of_filing);
-END
+END //
+DELIMITER ;
