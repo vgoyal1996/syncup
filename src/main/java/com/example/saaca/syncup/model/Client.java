@@ -1,7 +1,6 @@
 package com.example.saaca.syncup.model;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -78,7 +77,6 @@ public class Client implements Serializable {
     @OneToMany(mappedBy = "client",
                 cascade = CascadeType.ALL,
                 orphanRemoval = true)
-    @JsonBackReference(value = "return-credentials-reference")
     private Set<ReturnCredentials> returnCredentialsList = new HashSet<>();
 
     public void addReturnCredential(ReturnCredentials returnCredential) {

@@ -52,14 +52,13 @@ public class DueDateScheduler {
         int currentYear = c.get(Calendar.YEAR);
         if (periodicity.equals("monthly")) {
             c.setTime(startDate);
-            c.add(Calendar.MONTH, -1);
             c.set(Calendar.DAY_OF_MONTH, 1);
             startDate = c.getTime();
             c.setTime(endDate);
-            c.add(Calendar.MONTH, -1);
             c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
             endDate = c.getTime();
             c.setTime(currentDate);
+            c.add(Calendar.MONTH, 1);
             c.set(Calendar.DAY_OF_MONTH, 1);
             if (returnForm.getMonthlyDayOccurrence() == 31) {
                 c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
@@ -71,10 +70,10 @@ public class DueDateScheduler {
             this.setDueDateOfFiling(c.getTime());
         } else if (periodicity.equals("yearly")) {
             c.setTime(startDate);
-            c.set(currentYear - 1, Calendar.APRIL, 1);
+            c.set(currentYear, Calendar.APRIL, 1);
             startDate = c.getTime();
             c.setTime(endDate);
-            c.set(currentYear, Calendar.MARCH, 31);
+            c.set(currentYear + 1, Calendar.MARCH, 31);
             endDate = c.getTime();
             c.setTime(endDate);
             c.set(Calendar.DAY_OF_MONTH, 1);
