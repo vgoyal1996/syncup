@@ -5,7 +5,7 @@ import com.example.saaca.syncup.model.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 

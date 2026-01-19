@@ -1,21 +1,18 @@
 package com.example.saaca.syncup.model;
 
 import com.fasterxml.jackson.annotation.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "return_forms")
+@NoArgsConstructor
 @Getter
 @Setter
-@RequiredArgsConstructor
 @ToString
 public class ReturnForm implements Serializable {
 
@@ -23,7 +20,7 @@ public class ReturnForm implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "form_id")
     private int formId;
-    @Column(name = "form_name")
+    @Column(name = "form_name", unique = true)
     @NotNull
     private String formName;
     @Column(name = "return_type")
@@ -54,18 +51,10 @@ public class ReturnForm implements Serializable {
     private int thirdQuarterMonthOccurrence;
     @Column(name = "fourth_quarter_month_occurrence")
     private int fourthQuarterMonthOccurrence;
-    @OneToMany(
-            mappedBy = "returnForm",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "returnForm", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
     private Set<ClientReturnForms> applicableReturnForms = new HashSet<>();
-    @OneToMany(
-            mappedBy = "form",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "form", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DueDateScheduler> dueDateSchedulerSet = new HashSet<>();
 
     public void addClientReturnForm(ClientReturnForms clientReturnForm) {
@@ -94,8 +83,10 @@ public class ReturnForm implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ReturnForm that = (ReturnForm) o;
         return Objects.equals(formName, that.formName);
     }

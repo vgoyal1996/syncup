@@ -2,19 +2,23 @@ package com.example.saaca.syncup.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "client_return_form_applicability",
-        uniqueConstraints=
-        @UniqueConstraint(columnNames={"form_name", "assessment_year", "return_credentials_id"})
-)
+@NoArgsConstructor
+@Table(name = "client_return_form_applicability", uniqueConstraints = @UniqueConstraint(columnNames = { "form_name",
+        "assessment_year", "return_credentials_id" }))
 public class ClientReturnForms {
+
+    public ClientReturnForms(String assessmentYear) {
+        this.assessmentYear = assessmentYear;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,16 +46,12 @@ public class ClientReturnForms {
     @Column(name = "date_of_physical_deposit")
     private String dateOfPhysicalDeposit;
 
-    private ClientReturnForms() {}
-
-    public ClientReturnForms(String assessmentYear) {
-        this.assessmentYear = assessmentYear;
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ClientReturnForms that = (ClientReturnForms) o;
         return Objects.equals(returnForm, that.returnForm) &&
                 Objects.equals(assessmentYear, that.assessmentYear) &&
