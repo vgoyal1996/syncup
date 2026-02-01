@@ -4,8 +4,6 @@ import com.example.saaca.syncup.dao.LoginRepository;
 import com.example.saaca.syncup.model.Login;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,13 +18,18 @@ public class LoginController {
     private LoginRepository loginRepository;
 
     @PostMapping("/signup")
-    public void createAccount(@RequestBody final Login credentials){
-       loginRepository.save(credentials);
+    public void createAccount(@RequestBody final Login credentials) {
+        loginRepository.save(credentials);
     }
 
-    @GetMapping("/validate/{userId}")
-    public Login getLoginCredentials(@PathVariable String userId){
-        return loginRepository.findByUserId(userId);
+    @PostMapping("/validate")
+    public org.springframework.http.ResponseEntity<Login> login(@RequestBody Login loginRequest) {
+        Login user = loginRepository.findByUserId(loginRequest.getUserId());
+        if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
+            user.setPassword(null); // Do not send password back to client
+            return org.springframework.http.ResponseEntity.ok(user);
+        }
+        return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
     }
 
 }
