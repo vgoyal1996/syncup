@@ -18,8 +18,14 @@ public class LoginController {
     private LoginRepository loginRepository;
 
     @PostMapping("/signup")
-    public void createAccount(@RequestBody final Login credentials) {
+    public org.springframework.http.ResponseEntity<?> createAccount(@RequestBody final Login credentials) {
+        if (loginRepository.findByUserId(credentials.getUserId()) != null) {
+            return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.CONFLICT)
+                    .body("User already exists");
+        }
+        credentials.setLoginId(0);
         loginRepository.save(credentials);
+        return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).build();
     }
 
     @PostMapping("/validate")
