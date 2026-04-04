@@ -12,7 +12,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "client_return_form_applicability", uniqueConstraints = @UniqueConstraint(columnNames = { "form_name",
+@Table(name = "client_return_form_applicability_v2", uniqueConstraints = @UniqueConstraint(columnNames = { "form_id",
         "assessment_year", "return_credentials_id" }))
 public class ClientReturnForms {
 
@@ -31,7 +31,7 @@ public class ClientReturnForms {
     private ReturnCredentials returnCredentials;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "form_name", referencedColumnName = "form_name")
+    @JoinColumn(name = "form_id", referencedColumnName = "form_id")
     private ReturnForm returnForm;
 
     @Column(name = "assessment_year")

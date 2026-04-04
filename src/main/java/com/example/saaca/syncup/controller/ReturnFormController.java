@@ -21,7 +21,7 @@ public class ReturnFormController {
 
     @PostMapping("/add")
     @Transactional
-    public ReturnForm createReturnForm(@RequestBody final ReturnForm returnForm){
+    public ReturnForm createReturnForm(@RequestBody final ReturnForm returnForm) {
         DueDateScheduler scheduler = new DueDateScheduler();
         scheduler.calculateStartDateAndEndDate(returnForm);
         scheduler.setToBeDelete(0);
@@ -31,37 +31,66 @@ public class ReturnFormController {
     }
 
     @GetMapping("/get/{returnType}")
-    public List<ReturnForm> getReturnForms(@PathVariable(value = "returnType")final String returnType){
+    public List<ReturnForm> getReturnForms(@PathVariable(value = "returnType") final String returnType) {
         return returnFormRepository.findByReturnType(returnType);
     }
 
-    @PutMapping("/{returnType}/{returnName}")
-    public ReturnForm updateReturnForm(@PathVariable(value = "returnType")final String returnType,
-                                   @PathVariable(value = "returnName")final String returnName,
-                                   @RequestBody final ReturnForm newReturnForm){
-        ReturnForm oldReturnForm = returnFormRepository.findByReturnTypeAndReturnForm(returnType, returnName);
+    @PutMapping("/update/{id}")
+    @Transactional
+    public ReturnForm updateReturnForm(@PathVariable(value = "id") final int id,
+            @RequestBody final ReturnForm newReturnForm) {
+        ReturnForm oldReturnForm = returnFormRepository.findById(id).orElse(null);
         if (oldReturnForm == null) {
             return null;
         }
+
+        // Update core fields
         oldReturnForm.setFormName(newReturnForm.getFormName());
         oldReturnForm.setReturnType(newReturnForm.getReturnType());
-        if (!oldReturnForm.getPeriodicity().equals(newReturnForm.getPeriodicity())) {
-            oldReturnForm.setPeriodicity(newReturnForm.getPeriodicity());
-            DueDateScheduler scheduler = new DueDateScheduler();
-            scheduler.calculateStartDateAndEndDate(oldReturnForm);
-            scheduler.setToBeDelete(0);
-            oldReturnForm.getDueDateSchedulerSet().clear();
-            oldReturnForm.addDueDateScheduler(scheduler);
-        }
+        oldReturnForm.setPeriodicity(newReturnForm.getPeriodicity());
+
+        // Always update occurrence fields from the new form
+        oldReturnForm.setMonthlyDayOccurrence(newReturnForm.getMonthlyDayOccurrence());
+        oldReturnForm.setYearlyDayOccurrence(newReturnForm.getYearlyDayOccurrence());
+        oldReturnForm.setYearlyMonthOccurrence(newReturnForm.getYearlyMonthOccurrence());
+
+        oldReturnForm.setFirstQuarterDayOccurrence(newReturnForm.getFirstQuarterDayOccurrence());
+        oldReturnForm.setFirstQuarterMonthOccurrence(newReturnForm.getFirstQuarterMonthOccurrence());
+
+        oldReturnForm.setSecondQuarterDayOccurrence(newReturnForm.getSecondQuarterDayOccurrence());
+        oldReturnForm.setSecondQuarterMonthOccurrence(newReturnForm.getSecondQuarterMonthOccurrence());
+
+        oldReturnForm.setThirdQuarterDayOccurrence(newReturnForm.getThirdQuarterDayOccurrence());
+        oldReturnForm.setThirdQuarterMonthOccurrence(newReturnForm.getThirdQuarterMonthOccurrence());
+
+        oldReturnForm.setFourthQuarterDayOccurrence(newReturnForm.getFourthQuarterDayOccurrence());
+        oldReturnForm.setFourthQuarterMonthOccurrence(newReturnForm.getFourthQuarterMonthOccurrence());
+
+        // Robust Switch: ALWAYS regenerate the schedule to ensure it matches the new
+        // parameters
+        // This handles both periodicity changes AND occurrence day/month changes.
+        oldReturnForm.getDueDateSchedulerSet().clear();
+
+        DueDateScheduler scheduler = new DueDateScheduler();
+        // Calculate based on the UPDATED oldReturnForm which now holds the new config
+        scheduler.calculateStartDateAndEndDate(oldReturnForm);
+        scheduler.setToBeDelete(0);
+        oldReturnForm.addDueDateScheduler(scheduler);
 
         return returnFormRepository.save(oldReturnForm);
     }
 
     @DeleteMapping("/{returnType}")
     @Transactional
-    public int deleteReturnForms(@PathVariable(value = "returnType")final String returnType,
-                                  @RequestBody final String[] formNameList) {
-        return returnFormRepository.deleteReturnFormsWithFormNames(Arrays.asList(formNameList));
+    public int deleteReturnForms(@PathVariable(value = "returnType") final String returnType,
+            @RequestBody final String[] formNameList) {
+        List<ReturnForm> formsToDelete = returnFormRepository.findByFormNames(Arrays.asList(formNameList));
+        if (formsToDelete == null || formsToDelete.isEmpty()) {
+            return 0;
+        }
+        int count = formsToDelete.size();
+        returnFormRepository.deleteAll(formsToDelete);
+        return count;
     }
 
     @GetMapping("/all")
@@ -70,8 +99,8 @@ public class ReturnFormController {
     }
 
     @PutMapping("/revised-due-date/{form_name}")
-    public ReturnForm addRevisedDueDateOfFiling(@PathVariable(value = "form_name")final String formName,
-                                             @RequestBody final DueDateScheduler dueDateScheduler) {
+    public ReturnForm addRevisedDueDateOfFiling(@PathVariable(value = "form_name") final String formName,
+            @RequestBody final DueDateScheduler dueDateScheduler) {
         List<ReturnForm> returnForms = returnFormRepository.findByFormNames(Arrays.asList(formName));
         if (returnForms == null) {
             return null;
@@ -79,7 +108,7 @@ public class ReturnFormController {
         ReturnForm returnForm = returnForms.get(0);
         Date currentDate = new Date();
         Date revisedDueDate = dueDateScheduler.getRevisedDueDateOfFiling();
-        for (DueDateScheduler scheduler: returnForm.getDueDateSchedulerSet()) {
+        for (DueDateScheduler scheduler : returnForm.getDueDateSchedulerSet()) {
             if (scheduler.getToBeDelete() == 0) {
                 scheduler.setRevisedDueDateOfFiling(revisedDueDate);
             }

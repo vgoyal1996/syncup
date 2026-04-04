@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 @Entity
-@Table(name = "due_date_scheduler")
+@Table(name = "due_date_schedules")
 @Getter
 @Setter
 public class DueDateScheduler {
@@ -22,7 +22,7 @@ public class DueDateScheduler {
     @Column(name = "id")
     private int id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "form_name", referencedColumnName = "form_name")
+    @JoinColumn(name = "form_id", referencedColumnName = "form_id")
     @JsonBackReference
     private ReturnForm form;
     @Column(name = "from_date")
@@ -99,7 +99,8 @@ public class DueDateScheduler {
                 c.add(Calendar.MONTH, returnForm.getFirstQuarterMonthOccurrence());
                 if (returnForm.getFirstQuarterDayOccurrence() == 31) {
                     c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY && returnForm.getFirstQuarterDayOccurrence() >= 28) {
+                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY
+                        && returnForm.getFirstQuarterDayOccurrence() >= 28) {
                     c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
                 } else {
                     c.set(Calendar.DAY_OF_MONTH, returnForm.getFirstQuarterDayOccurrence());
@@ -117,7 +118,8 @@ public class DueDateScheduler {
                 c.add(Calendar.MONTH, returnForm.getSecondQuarterMonthOccurrence());
                 if (returnForm.getSecondQuarterDayOccurrence() == 31) {
                     c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY && returnForm.getSecondQuarterDayOccurrence() >= 28) {
+                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY
+                        && returnForm.getSecondQuarterDayOccurrence() >= 28) {
                     c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
                 } else {
                     c.set(Calendar.DAY_OF_MONTH, returnForm.getSecondQuarterDayOccurrence());
@@ -135,7 +137,8 @@ public class DueDateScheduler {
                 c.add(Calendar.MONTH, returnForm.getThirdQuarterMonthOccurrence());
                 if (returnForm.getThirdQuarterDayOccurrence() == 31) {
                     c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY && returnForm.getThirdQuarterDayOccurrence() >= 28) {
+                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY
+                        && returnForm.getThirdQuarterDayOccurrence() >= 28) {
                     c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
                 } else {
                     c.set(Calendar.DAY_OF_MONTH, returnForm.getThirdQuarterDayOccurrence());
@@ -153,7 +156,8 @@ public class DueDateScheduler {
                 c.add(Calendar.MONTH, returnForm.getFourthQuarterMonthOccurrence());
                 if (returnForm.getFourthQuarterDayOccurrence() == 31) {
                     c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY && returnForm.getFourthQuarterDayOccurrence() >= 28) {
+                } else if (c.get(Calendar.MONTH) == Calendar.FEBRUARY
+                        && returnForm.getFourthQuarterDayOccurrence() >= 28) {
                     c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
                 } else {
                     c.set(Calendar.DAY_OF_MONTH, returnForm.getFourthQuarterDayOccurrence());

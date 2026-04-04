@@ -14,6 +14,7 @@ import java.util.*;
 @Getter
 @Setter
 @ToString
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class ReturnForm implements Serializable {
 
     @Id
